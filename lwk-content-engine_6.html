@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Content Engine" />
+<title>LWK Content Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #f4f6f9;
+  --white:    #ffffff;
+  --blue-50:  #eff4ff;
+  --blue-100: #dce8fd;
+  --blue-400: #6096f5;
+  --blue-500: #3b74f0;
+  --blue-600: #2558d4;
+  --border:   #e2e7ef;
+  --border2:  #cdd4e0;
+  --grey-100: #f0f3f7;
+  --grey-200: #e2e7ef;
+  --grey-300: #cdd4e0;
+  --grey-400: #9aa5b8;
+  --grey-500: #6b7893;
+  --grey-700: #3d4a5c;
+  --grey-900: #1a2235;
+  --radius:   8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(26,34,53,0.07),0 1px 2px rgba(26,34,53,0.04);
+  --shadow-md:0 4px 12px rgba(26,34,53,0.08),0 2px 4px rgba(26,34,53,0.04);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html { height: 100%; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--grey-900);
+  min-height: 100%;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ===================== DESKTOP LAYOUT ===================== */
+.desktop-layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.brand-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--blue-50); border: 1px solid var(--blue-100);
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 11px; font-weight: 500; color: var(--blue-600); margin-bottom: 8px;
+}
+.brand-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-500); }
+.brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; font-weight: 700; color: var(--grey-900); }
+.brand-sub { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+
+.step-block { padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.step-label { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
+.step-num {
+  width: 19px; height: 19px; border-radius: 50%;
+  background: var(--blue-500); color: #fff;
+  font-size: 10px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-text { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--grey-500); }
+
+.context-fields { display: flex; flex-direction: column; gap: 8px; }
+.field-group { display: flex; flex-direction: column; gap: 3px; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--grey-500); }
+.field-input {
+  width: 100%; padding: 7px 10px;
+  border-radius: var(--radius); border: 1px solid var(--border2);
+  background: var(--white); font-size: 12px; color: var(--grey-900);
+  font-family: 'Inter', sans-serif; line-height: 1.5; resize: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.field-input:focus { outline: none; border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+.field-input::placeholder { color: var(--grey-400); }
+
+.base-list { display: flex; flex-direction: column; gap: 3px; }
+.base-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: var(--radius);
+  border: 1px solid transparent; cursor: pointer;
+  background: transparent; color: var(--grey-500);
+  font-size: 13px; text-align: left; width: 100%;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.base-item:hover { background: var(--grey-100); color: var(--grey-700); }
+.base-item.active { background: var(--blue-50); border-color: var(--blue-100); color: var(--blue-600); font-weight: 500; }
+.base-icon {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--grey-100);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.base-item.active .base-icon { background: var(--blue-100); }
+
+.prompt-panel { flex: 1; padding: 14px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+.prompt-panel-top { display: flex; align-items: center; justify-content: space-between; }
+.prompt-count { font-size: 12px; font-weight: 500; color: var(--grey-700); display: flex; align-items: center; gap: 5px; }
+.count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 20px; background: var(--blue-500); color: #fff;
+  font-size: 11px; font-weight: 600;
+}
+.reset-btn { font-size: 12px; color: var(--grey-400); background: none; border: none; cursor: pointer; padding: 0; font-family: 'Inter', sans-serif; }
+.reset-btn:hover { color: var(--grey-700); text-decoration: underline; }
+
+.prompt-box {
+  background: var(--grey-100); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 11px 12px;
+  font-size: 12px; color: var(--grey-400); line-height: 1.65; min-height: 80px;
+  font-style: italic; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.prompt-box.has-content { background: var(--blue-50); border-color: var(--blue-100); color: var(--grey-700); font-style: normal; }
+
+.copy-btn {
+  width: 100%; padding: 10px; border-radius: var(--radius);
+  background: var(--blue-500); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+  transition: background 0.15s, transform 0.1s; flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--blue-600); }
+.copy-btn:active { transform: scale(0.98); }
+
+.how-to { background: var(--grey-100); border-radius: var(--radius); padding: 10px 12px; font-size: 11.5px; color: var(--grey-500); line-height: 1.6; }
+.how-to strong { color: var(--grey-700); font-weight: 500; }
+
+.desk-main { padding: 32px 36px; overflow-y: auto; }
+.main-header { margin-bottom: 22px; }
+.main-eyebrow { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+.main-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 21px; font-weight: 700; color: var(--grey-900); margin-bottom: 4px; }
+.main-title span { color: var(--blue-500); }
+.main-sub { font-size: 13px; color: var(--grey-400); }
+
+.tweaks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 9px; }
+
+.tweak-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: border-color 0.15s, box-shadow 0.15s;
+}
+.tweak-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+.tweak-card.open { border-color: var(--grey-300); }
+.tweak-card.has-selection { border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50), var(--shadow-sm); }
+
+.tweak-header {
+  display: flex; align-items: center; gap: 7px;
+  padding: 11px 13px; cursor: pointer; user-select: none;
+  transition: background 0.1s;
+}
+.tweak-header:hover { background: var(--grey-100); }
+.tweak-num { font-size: 10px; font-weight: 600; color: var(--grey-300); min-width: 16px; }
+.tweak-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--grey-700); flex: 1; }
+.tweak-card.has-selection .tweak-name { color: var(--blue-600); }
+.tweak-selected-val {
+  font-size: 10px; color: var(--blue-600); font-weight: 500;
+  max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 20px; padding: 1px 7px;
+}
+.tweak-chevron { color: var(--grey-300); font-size: 11px; transition: transform 0.15s, color 0.15s; flex-shrink: 0; }
+.tweak-card.open .tweak-chevron { transform: rotate(180deg); color: var(--grey-500); }
+.tweak-body { display: none; padding: 6px 13px 12px; gap: 5px; flex-wrap: wrap; border-top: 1px solid var(--border); background: var(--grey-100); }
+.tweak-card.open .tweak-body { display: flex; }
+
+.opt-btn {
+  padding: 4px 11px; border-radius: 20px;
+  border: 1px solid var(--border2); background: var(--white);
+  font-size: 12px; color: var(--grey-500); cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.1s;
+}
+.opt-btn:hover { color: var(--grey-700); border-color: var(--grey-300); }
+.opt-btn.chosen { background: var(--blue-500); border-color: var(--blue-500); color: #fff; font-weight: 500; }
+
+.qa-block { display: none; flex-direction: column; gap: 6px; margin-top: 12px; }
+.qa-block.visible { display: flex; }
+.qa-label { font-size: 11px; font-weight: 500; color: var(--grey-500); }
+.qa-add-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: var(--radius);
+  border: 1px dashed var(--border2); background: transparent;
+  font-size: 12px; color: var(--grey-400); cursor: pointer;
+  font-family: 'Inter', sans-serif; width: fit-content;
+  transition: border-color 0.1s, color 0.1s;
+}
+.qa-add-btn:hover { border-color: var(--blue-400); color: var(--blue-500); }
+.qa-row { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 5px; }
+.qa-input {
+  flex: 1; padding: 6px 9px; border-radius: var(--radius);
+  border: 1px solid var(--border2); background: var(--white);
+  font-size: 12px; color: var(--grey-900); font-family: 'Inter', sans-serif; resize: none; line-height: 1.4;
+}
+.qa-input:focus { outline: none; border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+.qa-remove {
+  padding: 6px 8px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: transparent;
+  font-size: 13px; color: var(--grey-400); cursor: pointer; line-height: 1;
+}
+.qa-remove:hover { color: #e24b4a; border-color: #e24b4a; }
+
+/* ===================== MOBILE LAYOUT ===================== */
+.mobile-layout { display: none; flex-direction: column; min-height: 100vh; }
+
+/* Mobile header */
+.mob-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  padding-top: calc(12px + var(--safe-top));
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.mob-brand { display: flex; flex-direction: column; }
+.mob-brand-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; color: var(--grey-900); }
+.mob-brand-sub { font-size: 11px; color: var(--grey-400); }
+.mob-prompt-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--blue-500); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, transform 0.1s;
+}
+.mob-prompt-btn:active { transform: scale(0.96); background: var(--blue-600); }
+.mob-badge {
+  background: rgba(255,255,255,0.25);
+  border-radius: 20px; padding: 1px 6px;
+  font-size: 11px; font-weight: 700;
+}
+
+/* Mobile tabs */
+.mob-tabs {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; overflow-x: auto; gap: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.mob-tabs::-webkit-scrollbar { display: none; }
+
+.mob-tab {
+  flex-shrink: 0; padding: 10px 16px;
+  font-size: 13px; font-weight: 500; color: var(--grey-400);
+  border: none; background: transparent; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.1s, border-color 0.1s;
+  white-space: nowrap;
+}
+.mob-tab.active { color: var(--blue-500); border-bottom-color: var(--blue-500); font-weight: 600; }
+
+/* Mobile tab content */
+.mob-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+.mob-pane { display: none; padding: 16px; padding-bottom: calc(16px + var(--safe-bottom)); }
+.mob-pane.active { display: block; }
+
+/* Mobile section headers */
+.mob-section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px; font-weight: 700; color: var(--grey-900); margin-bottom: 4px;
+}
+.mob-section-sub { font-size: 13px; color: var(--grey-400); margin-bottom: 16px; }
+
+/* Mobile context card */
+.mob-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 16px;
+  box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.mob-card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey-400); margin-bottom: 12px; }
+.mob-field-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.mob-field-group:last-child { margin-bottom: 0; }
+.mob-field-label { font-size: 12px; font-weight: 500; color: var(--grey-600); }
+.mob-field-input {
+  width: 100%; padding: 10px 12px;
+  border-radius: var(--radius); border: 1px solid var(--border2);
+  background: var(--grey-100); font-size: 14px; color: var(--grey-900);
+  font-family: 'Inter', sans-serif; line-height: 1.5; resize: none;
+  -webkit-appearance: none; appearance: none;
+  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+}
+.mob-field-input:focus { outline: none; background: var(--white); border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+.mob-field-input::placeholder { color: var(--grey-400); }
+
+/* Mobile base prompts */
+.mob-base-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.mob-base-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 12px;
+  cursor: pointer; text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-base-card.active {
+  border-color: var(--blue-400);
+  background: var(--blue-50);
+  box-shadow: 0 0 0 3px var(--blue-50), var(--shadow-sm);
+}
+.mob-base-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+.mob-base-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: var(--grey-700); display: block; margin-bottom: 2px; }
+.mob-base-card.active .mob-base-name { color: var(--blue-600); }
+.mob-base-desc { font-size: 11px; color: var(--grey-400); line-height: 1.4; display: block; }
+
+/* Mobile Q&A */
+.mob-qa-block { display: none; }
+.mob-qa-block.visible { display: block; }
+.mob-qa-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.mob-qa-input {
+  flex: 1; padding: 10px 12px; border-radius: var(--radius);
+  border: 1px solid var(--border2); background: var(--grey-100);
+  font-size: 14px; color: var(--grey-900); font-family: 'Inter', sans-serif; resize: none; line-height: 1.4;
+  -webkit-appearance: none;
+}
+.mob-qa-input:focus { outline: none; background: var(--white); border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+.mob-qa-remove {
+  width: 36px; height: 36px; border-radius: var(--radius);
+  border: 1px solid var(--border2); background: var(--white);
+  font-size: 14px; color: var(--grey-400); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.mob-qa-add {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px; border-radius: var(--radius);
+  border: 1.5px dashed var(--border2); background: transparent;
+  font-size: 13px; color: var(--grey-400); cursor: pointer;
+  font-family: 'Inter', sans-serif; width: 100%; justify-content: center;
+  margin-top: 4px;
+}
+
+/* Mobile tweaks */
+.mob-tweaks-list { display: flex; flex-direction: column; gap: 8px; }
+
+.mob-tweak-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.12s;
+}
+.mob-tweak-card.has-selection { border-color: var(--blue-400); }
+
+.mob-tweak-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 14px; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-tweak-num { font-size: 11px; font-weight: 600; color: var(--grey-300); min-width: 18px; }
+.mob-tweak-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--grey-700); flex: 1; }
+.mob-tweak-card.has-selection .mob-tweak-name { color: var(--blue-600); }
+.mob-tweak-val {
+  font-size: 11px; color: var(--blue-600); font-weight: 500;
+  background: var(--blue-50); border: 1px solid var(--blue-100);
+  border-radius: 20px; padding: 2px 8px;
+  max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mob-tweak-chevron { color: var(--grey-300); font-size: 12px; transition: transform 0.15s; flex-shrink: 0; }
+.mob-tweak-card.open .mob-tweak-chevron { transform: rotate(180deg); }
+
+.mob-tweak-body {
+  display: none; padding: 4px 14px 14px; gap: 7px; flex-wrap: wrap;
+  border-top: 1px solid var(--border); background: var(--grey-100);
+}
+.mob-tweak-card.open .mob-tweak-body { display: flex; }
+
+.mob-opt-btn {
+  padding: 7px 14px; border-radius: 20px;
+  border: 1.5px solid var(--border2); background: var(--white);
+  font-size: 13px; color: var(--grey-500); cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.1s;
+}
+.mob-opt-btn:active { transform: scale(0.96); }
+.mob-opt-btn.chosen { background: var(--blue-500); border-color: var(--blue-500); color: #fff; font-weight: 500; }
+
+/* Mobile prompt pane */
+.mob-prompt-preview {
+  background: var(--blue-50); border: 1.5px solid var(--blue-100);
+  border-radius: var(--radius-xl); padding: 14px;
+  font-size: 13px; color: var(--grey-700); line-height: 1.7;
+  margin-bottom: 12px; min-height: 100px;
+}
+.mob-prompt-preview.empty { background: var(--grey-100); border-color: var(--border); color: var(--grey-400); font-style: italic; }
+
+.mob-copy-big {
+  width: 100%; padding: 15px;
+  border-radius: var(--radius-lg);
+  background: var(--blue-500); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px; font-weight: 700;
+  border: none; cursor: pointer; letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, transform 0.1s;
+  margin-bottom: 12px;
+}
+.mob-copy-big:active { background: var(--blue-600); transform: scale(0.98); }
+
+.mob-reset-row { display: flex; justify-content: center; }
+.mob-reset-link { font-size: 13px; color: var(--grey-400); background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; text-decoration: underline; text-underline-offset: 3px; padding: 8px; }
+
+.mob-how-to {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px;
+  font-size: 13px; color: var(--grey-500); line-height: 1.6; margin-top: 4px;
+}
+.mob-how-to strong { color: var(--grey-700); font-weight: 500; }
+
+.mob-tweak-summary {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+}
+.mob-summary-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--blue-50); border: 1px solid var(--blue-100);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 12px; color: var(--blue-600); font-weight: 500;
+}
+.mob-summary-pill span { cursor: pointer; color: var(--blue-400); font-size: 11px; }
+.mob-no-tweaks { font-size: 13px; color: var(--grey-400); font-style: italic; margin-bottom: 14px; }
+
+/* ===================== RESPONSIVE SWITCH ===================== */
+@media (max-width: 767px) {
+  .desktop-layout { display: none; }
+  .mobile-layout { display: flex; }
+}
+@media (min-width: 768px) {
+  .desktop-layout { display: grid; }
+  .mobile-layout { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- =================== DESKTOP =================== -->
+<div class="desktop-layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-pill"><span class="brand-dot"></span> Content Engine</div>
+      <div class="brand-title">Prompt Builder</div>
+      <div class="brand-sub">20 tweaks · infinite variations</div>
+    </div>
+
+    <div class="step-block">
+      <div class="step-label"><span class="step-num">1</span><span class="step-text">Your context</span></div>
+      <div class="context-fields">
+        <div class="field-group">
+          <label class="field-label">Business name</label>
+          <input class="field-input d-ctx" id="d-business" type="text" value="Learn with Kenneth" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Industry</label>
+          <input class="field-input d-ctx" id="d-industry" type="text" value="Power Platform education" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Product or service</label>
+          <input class="field-input d-ctx" id="d-product" type="text" value="online courses and workshops" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Target audience</label>
+          <textarea class="field-input d-ctx" id="d-audience" rows="2">operations managers at small-to-mid-sized businesses who want to automate manual processes without IT support or coding skills</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <div class="step-label"><span class="step-num">2</span><span class="step-text">Choose a base prompt</span></div>
+      <div class="base-list">
+        <button class="base-item active" data-base="contrarian" onclick="dSelectBase(this)"><span class="base-icon">💼</span><span>Contrarian</span></button>
+        <button class="base-item" data-base="lightbulb" onclick="dSelectBase(this)"><span class="base-icon">💡</span><span>Lightbulb</span></button>
+        <button class="base-item" data-base="trending" onclick="dSelectBase(this)"><span class="base-icon">📈</span><span>Trending Topics</span></button>
+        <button class="base-item" data-base="qa" onclick="dSelectBase(this)"><span class="base-icon">❓</span><span>Curiosity Q&amp;A</span></button>
+      </div>
+      <div class="qa-block" id="d-qa-block">
+        <div class="qa-label" style="margin-top:10px;">Your Q&amp;A questions</div>
+        <div id="d-qa-questions">
+          <div class="qa-row"><textarea class="qa-input d-qa">Can I automate my job without knowing how to code?</textarea><button class="qa-remove" onclick="dRemoveQ(this)">✕</button></div>
+          <div class="qa-row"><textarea class="qa-input d-qa">What's the difference between Power Automate and Power Apps?</textarea><button class="qa-remove" onclick="dRemoveQ(this)">✕</button></div>
+          <div class="qa-row"><textarea class="qa-input d-qa">How long does it actually take to build your first Power App?</textarea><button class="qa-remove" onclick="dRemoveQ(this)">✕</button></div>
+        </div>
+        <button class="qa-add-btn" onclick="dAddQ()">+ Add question</button>
+      </div>
+    </div>
+
+    <div class="prompt-panel">
+      <div class="step-label"><span class="step-num">4</span><span class="step-text">Copy your prompt</span></div>
+      <div class="prompt-panel-top">
+        <span class="prompt-count"><span class="count-badge" id="d-tweak-count">0</span> tweaks selected</span>
+        <button class="reset-btn" onclick="dResetTweaks()">Reset tweaks</button>
+      </div>
+      <div class="prompt-box" id="d-prompt-box">Fill in your context, pick a base prompt, and select tweaks to build your prompt.</div>
+      <button class="copy-btn" id="d-copy-btn" onclick="dCopy()">Copy Prompt for Claude</button>
+      <div class="how-to"><strong>How to use:</strong> Copy the prompt, open a new chat at claude.ai, and paste it in.</div>
+    </div>
+  </aside>
+
+  <main class="desk-main">
+    <div class="main-header">
+      <div class="main-eyebrow"><span class="step-num">3</span><span class="step-text">Pick your tweaks</span></div>
+      <div class="main-title">Remix your content <span>your way</span></div>
+      <div class="main-sub">Click any card to expand it and pick an option. Stack as many tweaks as you want.</div>
+    </div>
+    <div class="tweaks-grid" id="d-tweaks-grid"></div>
+  </main>
+</div>
+
+<!-- =================== MOBILE =================== -->
+<div class="mobile-layout">
+  <div class="mob-header">
+    <div class="mob-brand">
+      <span class="mob-brand-name">Content Engine</span>
+      <span class="mob-brand-sub">Learn with Kenneth</span>
+    </div>
+    <button class="mob-prompt-btn" onclick="mGoToPrompt()">
+      Copy prompt <span class="mob-badge" id="m-header-count">0</span>
+    </button>
+  </div>
+
+  <div class="mob-tabs">
+    <button class="mob-tab active" onclick="mSwitchTab('context', this)">Context</button>
+    <button class="mob-tab" onclick="mSwitchTab('base', this)">Base Prompt</button>
+    <button class="mob-tab" onclick="mSwitchTab('tweaks', this)">Tweaks</button>
+    <button class="mob-tab" onclick="mSwitchTab('prompt', this)">My Prompt</button>
+  </div>
+
+  <div class="mob-content">
+
+    <!-- TAB: Context -->
+    <div class="mob-pane active" id="m-pane-context">
+      <div class="mob-section-title">Your context</div>
+      <div class="mob-section-sub">These details power every prompt you build.</div>
+      <div class="mob-card">
+        <div class="mob-card-title">Business details</div>
+        <div class="mob-field-group">
+          <label class="mob-field-label">Business name</label>
+          <input class="mob-field-input m-ctx" id="m-business" type="text" value="Learn with Kenneth" />
+        </div>
+        <div class="mob-field-group">
+          <label class="mob-field-label">Industry</label>
+          <input class="mob-field-input m-ctx" id="m-industry" type="text" value="Power Platform education" />
+        </div>
+        <div class="mob-field-group">
+          <label class="mob-field-label">Product or service</label>
+          <input class="mob-field-input m-ctx" id="m-product" type="text" value="online courses and workshops" />
+        </div>
+        <div class="mob-field-group">
+          <label class="mob-field-label">Target audience</label>
+          <textarea class="mob-field-input m-ctx" id="m-audience" rows="3">operations managers at small-to-mid-sized businesses who want to automate manual processes without IT support or coding skills</textarea>
+        </div>
+      </div>
+      <button class="mob-copy-big" style="margin-top:8px;" onclick="mSwitchTabByName('base')">Next: Choose base prompt →</button>
+    </div>
+
+    <!-- TAB: Base Prompt -->
+    <div class="mob-pane" id="m-pane-base">
+      <div class="mob-section-title">Choose a base prompt</div>
+      <div class="mob-section-sub">Pick the type of content you want to create.</div>
+      <div class="mob-base-grid">
+        <button class="mob-base-card active" data-base="contrarian" onclick="mSelectBase(this)">
+          <span class="mob-base-icon">💼</span>
+          <span class="mob-base-name">Contrarian</span>
+          <span class="mob-base-desc">Challenge what the industry believes</span>
+        </button>
+        <button class="mob-base-card" data-base="lightbulb" onclick="mSelectBase(this)">
+          <span class="mob-base-icon">💡</span>
+          <span class="mob-base-name">Lightbulb</span>
+          <span class="mob-base-desc">Share what most people don't know</span>
+        </button>
+        <button class="mob-base-card" data-base="trending" onclick="mSelectBase(this)">
+          <span class="mob-base-icon">📈</span>
+          <span class="mob-base-name">Trending</span>
+          <span class="mob-base-desc">Tie into what's trending now</span>
+        </button>
+        <button class="mob-base-card" data-base="qa" onclick="mSelectBase(this)">
+          <span class="mob-base-icon">❓</span>
+          <span class="mob-base-name">Q&amp;A</span>
+          <span class="mob-base-desc">Answer audience questions</span>
+        </button>
+      </div>
+
+      <div class="mob-qa-block" id="m-qa-block">
+        <div class="mob-card">
+          <div class="mob-card-title">Your Q&amp;A questions</div>
+          <div id="m-qa-questions">
+            <div class="mob-qa-row"><textarea class="mob-qa-input m-qa" rows="2">Can I automate my job without knowing how to code?</textarea><button class="mob-qa-remove" onclick="mRemoveQ(this)">✕</button></div>
+            <div class="mob-qa-row"><textarea class="mob-qa-input m-qa" rows="2">What's the difference between Power Automate and Power Apps?</textarea><button class="mob-qa-remove" onclick="mRemoveQ(this)">✕</button></div>
+            <div class="mob-qa-row"><textarea class="mob-qa-input m-qa" rows="2">How long does it actually take to build your first Power App?</textarea><button class="mob-qa-remove" onclick="mRemoveQ(this)">✕</button></div>
+          </div>
+          <button class="mob-qa-add" onclick="mAddQ()">+ Add question</button>
+        </div>
+      </div>
+
+      <button class="mob-copy-big" style="margin-top:12px;" onclick="mSwitchTabByName('tweaks')">Next: Pick tweaks →</button>
+    </div>
+
+    <!-- TAB: Tweaks -->
+    <div class="mob-pane" id="m-pane-tweaks">
+      <div class="mob-section-title">Pick your tweaks</div>
+      <div class="mob-section-sub">Tap any card to expand it. Stack as many as you like.</div>
+      <div class="mob-tweaks-list" id="m-tweaks-list"></div>
+      <button class="mob-copy-big" style="margin-top:16px;" onclick="mSwitchTabByName('prompt')">View my prompt →</button>
+    </div>
+
+    <!-- TAB: Prompt -->
+    <div class="mob-pane" id="m-pane-prompt">
+      <div class="mob-section-title">Your prompt</div>
+      <div class="mob-section-sub">Copy it and paste into Claude.</div>
+
+      <div id="m-tweak-summary"></div>
+
+      <div class="mob-prompt-preview" id="m-prompt-preview"></div>
+      <button class="mob-copy-big" onclick="mCopy()" id="m-copy-btn">Copy Prompt for Claude</button>
+
+      <div class="mob-reset-row">
+        <button class="mob-reset-link" onclick="mResetTweaks()">Reset all tweaks</button>
+      </div>
+
+      <div class="mob-how-to">
+        <strong>How to use:</strong> Copy the prompt above, open a new chat at claude.ai, paste it in, and hit send. Claude will generate your new content variation instantly.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===== SHARED DATA ===== */
+const tweaks = [
+  { id:'type',        title:'Ad Type',         options:['Instagram ad','YouTube script','Infomercial','Blog post','TikTok script','Email newsletter','Twitter/X thread','Facebook post','LinkedIn post'] },
+  { id:'perspective', title:'Perspective',      options:['Business owner','The customer','A skeptic','A new hire','The product itself','A competitor'] },
+  { id:'mood',        title:'Mood',             options:['Panicked','Romantic','Inspirational','Mysterious','Triumphant','Nostalgic','Excited'] },
+  { id:'style',       title:'Style',            options:['Dr. Seuss','Shakespeare','Tony Robbins','Simon Sinek','Gary Vee','Naval Ravikant'] },
+  { id:'tone',        title:'Tone',             options:['Formal','Concerned','Sarcastic','Humorous','Urgent','Empathetic','Confident'] },
+  { id:'voice',       title:'Voice',            options:['Morgan Freeman','Oprah','Steve Jobs','David Goggins','Barack Obama','Mel Robbins'] },
+  { id:'length',      title:'Length',           options:['Shorter','Longer','250 characters max','3 sentences only','500 words','One-liner'] },
+  { id:'format',      title:'Format',           options:['Bullet points','Single paragraph','Short sentences','Numbered list','Bold headers','Q&A format'] },
+  { id:'elements',    title:'Elements',         options:['Add a metaphor','Add an analogy','Add a short story','Add a statistic','Add a rhetorical question'] },
+  { id:'inspiration', title:'Inspired By',      options:['Old Spice ad','TED Talk','Apple keynote','Wolf of Wall Street','Infomercial','ESPN SportsCenter'] },
+  { id:'slang',       title:'Slang',            options:['Gen Z slang','Hip hop slang','Corporate buzzwords','Plain everyday language','Southern US slang'] },
+  { id:'imagery',     title:'Imagery',          options:['Battlefield','Deserted island','First day of school','Sports game','Road trip','Construction site'] },
+  { id:'pacing',      title:'Pacing',           options:['Punchy & fast','Slow & suspenseful','Rhythmic','Rapid fire list','Deliberate & measured'] },
+  { id:'formality',   title:'Formality',        options:['Professional','Best friend chat','Talking to royalty','Casual Friday','Town hall speech'] },
+  { id:'time',        title:'Time Period',       options:['1920s','Year 3025','1980s','1990s','Medieval times','Wild West'] },
+  { id:'genre',       title:'Genre',            options:['Murder mystery','Romantic novel','Fantasy fiction','Sports movie','Documentary narration'] },
+  { id:'rhythm',      title:'Rhythm',           options:['Jingle with rhyme','Spoken word poetry','90s rap','Haiku','Limerick'] },
+  { id:'energy',      title:'Energy Level',     options:['ALL CAPS high energy','Calm and soft','Bold & motivational','Quiet confidence','Explosive hype'] },
+  { id:'character',   title:'Character',        options:['Disney villain','Mafia boss','Superhero','Wise mentor','Underdog champion','Drill sergeant'] },
+  { id:'funny',       title:'Make It Funnier',  options:['Funnier overall','Add a punchline joke','Absurd humor','Self-deprecating','Dry wit'] }
+];
+
+const baseTemplates = {
+  contrarian: (c) => `PRETEND YOU ARE A STRAIGHT-TALKING, EXPERIENCED BUSINESS OWNER of ${c.business} in the ${c.industry} industry that sells ${c.product} to ${c.audience}, AND WRITE ME A MEDIUM-LENGTH POST THAT IS HELPFUL BUT CONTRARIAN TO WHAT MOST OF THE INDUSTRY BELIEVES.`,
+  lightbulb:  (c) => `PRETEND YOU ARE AN ENERGETIC, MISSION-DRIVEN BUSINESS OWNER of ${c.business} in the ${c.industry} industry that sells ${c.product} to ${c.audience}, AND WRITE ME A MEDIUM-LENGTH POST THAT IS HELPFUL AND THAT MOST PEOPLE ARE UNAWARE OF OR IGNORANT TO.`,
+  trending:   (c) => `PRETEND YOU ARE A RELATABLE, CONVERSATIONAL BUSINESS OWNER of ${c.business} in the ${c.industry} industry that sells ${c.product} to ${c.audience}, AND WRITE ME A MEDIUM-LENGTH POST AS A STORY THAT IS HELPFUL AND RELATIVE TO CURRENT TRENDING TOPICS IN THIS INDUSTRY.`,
+  qa: (c, qs) => {
+    const list = qs.map((q,i)=>`${i+1}. ${q}`).join('\n');
+    return `PRETEND YOU ARE A WITTY, APPROACHABLE BUSINESS OWNER of ${c.business} in the ${c.industry} industry that sells ${c.product} to ${c.audience}, AND USING THE QUESTIONS BELOW, WRITE ME AN EXCITING POST FOR EACH THAT ANSWERS EACH QUESTION. MAKE SURE EVERY ANSWER IS ITS OWN PIECE OF CONTENT:\n\n${list}`;
+  }
+};
+
+let selectedTweaks = {};
+let dBase = 'contrarian';
+let dOpenCard = null;
+let mBase = 'contrarian';
+let mOpenCard = null;
+
+/* ===== SHARED HELPERS ===== */
+function buildPrompt(base, ctx, qs) {
+  const b = base === 'qa' ? baseTemplates.qa(ctx, qs) : baseTemplates[base](ctx);
+  const keys = Object.keys(selectedTweaks);
+  if (!keys.length) return b;
+  return `${b}\n\nFor this variation, make it: ${keys.map(k=>selectedTweaks[k]).join(', ')}.`;
+}
+
+function getDCtx() {
+  return {
+    business: document.getElementById('d-business').value.trim()||'my business',
+    industry: document.getElementById('d-industry').value.trim()||'my industry',
+    product:  document.getElementById('d-product').value.trim()||'my product',
+    audience: document.getElementById('d-audience').value.trim()||'my audience'
+  };
+}
+
+function getMCtx() {
+  return {
+    business: document.getElementById('m-business').value.trim()||'my business',
+    industry: document.getElementById('m-industry').value.trim()||'my industry',
+    product:  document.getElementById('m-product').value.trim()||'my product',
+    audience: document.getElementById('m-audience').value.trim()||'my audience'
+  };
+}
+
+function getDQs() { return Array.from(document.querySelectorAll('.d-qa')).map(e=>e.value.trim()).filter(Boolean); }
+function getMQs() { return Array.from(document.querySelectorAll('.m-qa')).map(e=>e.value.trim()).filter(Boolean); }
+
+function tweakCount() { return Object.keys(selectedTweaks).length; }
+
+/* ===== DESKTOP ===== */
+function dRender() {
+  const grid = document.getElementById('d-tweaks-grid');
+  grid.innerHTML = '';
+  tweaks.forEach((t,i) => {
+    const hasSel = !!selectedTweaks[t.id];
+    const isOpen = dOpenCard === t.id;
+    const card = document.createElement('div');
+    card.className = 'tweak-card'+(isOpen?' open':'')+(hasSel?' has-selection':'');
+    card.innerHTML = `<div class="tweak-header" onclick="dToggleCard('${t.id}')"><span class="tweak-num">${String(i+1).padStart(2,'0')}</span><span class="tweak-name">${t.title}</span>${hasSel?`<span class="tweak-selected-val">${selectedTweaks[t.id]}</span>`:''}<span class="tweak-chevron">▾</span></div><div class="tweak-body">${t.options.map(o=>`<button class="opt-btn${selectedTweaks[t.id]===o?' chosen':''}" onclick="pickOpt(event,'${t.id}','${o.replace(/'/g,"\\'")}')">${o}</button>`).join('')}</div>`;
+    grid.appendChild(card);
+  });
+  dUpdatePrompt();
+}
+
+function dToggleCard(id) { dOpenCard = dOpenCard===id?null:id; dRender(); }
+
+function dSelectBase(btn) {
+  document.querySelectorAll('.base-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  dBase = btn.dataset.base;
+  document.getElementById('d-qa-block').classList.toggle('visible', dBase==='qa');
+  dUpdatePrompt();
+}
+
+function dUpdatePrompt() {
+  const box = document.getElementById('d-prompt-box');
+  const p = buildPrompt(dBase, getDCtx(), getDQs());
+  box.textContent = p;
+  box.classList.add('has-content');
+  document.getElementById('d-tweak-count').textContent = tweakCount();
+}
+
+function dCopy() {
+  navigator.clipboard.writeText(buildPrompt(dBase, getDCtx(), getDQs())).then(()=>{
+    const btn = document.getElementById('d-copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent='Copy Prompt for Claude',2000);
+  });
+}
+
+function dResetTweaks() { selectedTweaks={}; dOpenCard=null; dRender(); mRender(); }
+
+function dAddQ() {
+  const c = document.getElementById('d-qa-questions');
+  const row = document.createElement('div'); row.className='qa-row';
+  row.innerHTML=`<textarea class="qa-input d-qa" rows="1" placeholder="Enter a question..."></textarea><button class="qa-remove" onclick="dRemoveQ(this)">✕</button>`;
+  c.appendChild(row);
+  row.querySelector('textarea').addEventListener('input', dUpdatePrompt);
+  dUpdatePrompt();
+}
+function dRemoveQ(btn) { const rows=document.querySelectorAll('#d-qa-questions .qa-row'); if(rows.length<=1)return; btn.closest('.qa-row').remove(); dUpdatePrompt(); }
+
+/* ===== MOBILE ===== */
+function mRender() {
+  const list = document.getElementById('m-tweaks-list');
+  list.innerHTML = '';
+  tweaks.forEach((t,i) => {
+    const hasSel = !!selectedTweaks[t.id];
+    const isOpen = mOpenCard === t.id;
+    const card = document.createElement('div');
+    card.className = 'mob-tweak-card'+(isOpen?' open':'')+(hasSel?' has-selection':'');
+    card.innerHTML = `<div class="mob-tweak-header" onclick="mToggleCard('${t.id}')"><span class="mob-tweak-num">${String(i+1).padStart(2,'0')}</span><span class="mob-tweak-name">${t.title}</span>${hasSel?`<span class="mob-tweak-val">${selectedTweaks[t.id]}</span>`:''}<span class="mob-tweak-chevron">▾</span></div><div class="mob-tweak-body">${t.options.map(o=>`<button class="mob-opt-btn${selectedTweaks[t.id]===o?' chosen':''}" onclick="pickOpt(event,'${t.id}','${o.replace(/'/g,"\\'")}')">${o}</button>`).join('')}</div>`;
+    list.appendChild(card);
+  });
+  mUpdatePrompt();
+}
+
+function mToggleCard(id) { mOpenCard = mOpenCard===id?null:id; mRender(); }
+
+function mSelectBase(btn) {
+  document.querySelectorAll('.mob-base-card').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  mBase = btn.dataset.base;
+  document.getElementById('m-qa-block').classList.toggle('visible', mBase==='qa');
+  mUpdatePrompt();
+}
+
+function mUpdatePrompt() {
+  const p = buildPrompt(mBase, getMCtx(), getMQs());
+  const box = document.getElementById('m-prompt-preview');
+  box.textContent = p;
+  box.classList.toggle('empty', false);
+  const cnt = tweakCount();
+  document.getElementById('m-header-count').textContent = cnt;
+
+  // summary pills
+  const summary = document.getElementById('m-tweak-summary');
+  const keys = Object.keys(selectedTweaks);
+  if (keys.length === 0) {
+    summary.innerHTML = '<p class="mob-no-tweaks">No tweaks selected yet — go to the Tweaks tab to add some.</p>';
+  } else {
+    summary.innerHTML = '<div class="mob-tweak-summary">'+keys.map(k=>`<span class="mob-summary-pill">${selectedTweaks[k]} <span onclick="removeTweak('${k}')">✕</span></span>`).join('')+'</div>';
+  }
+}
+
+function mCopy() {
+  navigator.clipboard.writeText(buildPrompt(mBase, getMCtx(), getMQs())).then(()=>{
+    const btn = document.getElementById('m-copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent='Copy Prompt for Claude',2000);
+  });
+}
+
+function mResetTweaks() { selectedTweaks={}; mOpenCard=null; mRender(); dRender(); }
+
+function mAddQ() {
+  const c = document.getElementById('m-qa-questions');
+  const row = document.createElement('div'); row.className='mob-qa-row';
+  row.innerHTML=`<textarea class="mob-qa-input m-qa" rows="2" placeholder="Enter a question..."></textarea><button class="mob-qa-remove" onclick="mRemoveQ(this)">✕</button>`;
+  c.appendChild(row);
+  row.querySelector('textarea').addEventListener('input', mUpdatePrompt);
+  mUpdatePrompt();
+}
+function mRemoveQ(btn) { const rows=document.querySelectorAll('#m-qa-questions .mob-qa-row'); if(rows.length<=1)return; btn.closest('.mob-qa-row').remove(); mUpdatePrompt(); }
+
+function mGoToPrompt() { mSwitchTabByName('prompt'); }
+function mSwitchTabByName(name) { const tab = document.querySelector(`.mob-tab[onclick*="'${name}'"]`); if(tab) mSwitchTab(name, tab); }
+
+function mSwitchTab(name, btn) {
+  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.mob-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('m-pane-'+name).classList.add('active');
+  if (name==='prompt') mUpdatePrompt();
+}
+
+/* ===== SHARED TWEAK PICK ===== */
+function pickOpt(e, id, val) {
+  e.stopPropagation();
+  if (selectedTweaks[id]===val) { delete selectedTweaks[id]; } else { selectedTweaks[id]=val; }
+  dRender(); mRender();
+}
+
+function removeTweak(id) {
+  delete selectedTweaks[id];
+  dRender(); mRender();
+}
+
+/* ===== LIVE UPDATES ===== */
+document.querySelectorAll('.d-ctx').forEach(el=>el.addEventListener('input', dUpdatePrompt));
+document.querySelectorAll('.m-ctx').forEach(el=>el.addEventListener('input', mUpdatePrompt));
+document.querySelectorAll('.d-qa').forEach(el=>el.addEventListener('input', dUpdatePrompt));
+document.querySelectorAll('.m-qa').forEach(el=>el.addEventListener('input', mUpdatePrompt));
+
+/* ===== INIT ===== */
+dRender();
+mRender();
+mUpdatePrompt();
+</script>
+</body>
+</html>
